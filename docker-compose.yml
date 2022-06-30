@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+    web:
+        build: .
+        volumes:
+            - .:/code/
+            - .devcontainer/.bash_aliases:/root/.bash_aliases
+        environment:
+            - DJANGO_SETTINGS_MODULE=rmn_arch_0.settings.local
+        ports:
+            - 80:8000
+        depends_on:
+            - db
+
+    db:
+        image: postgres:12.7
+        environment:
+            POSTGRES_PASSWORD: password
+            POSTGRES_USER: web
+            POSTGRES_DB: web_db
+
+    redis:
+        image: redis:6

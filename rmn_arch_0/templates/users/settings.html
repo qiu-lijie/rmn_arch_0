@@ -1,0 +1,35 @@
+{% extends 'account/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Settings - {{ block.super }}{% endblock title %}
+{% block metatags %}
+<meta name="robots" content="noindex">
+{% endblock metatags %}
+
+{% block inner_content %}
+<h1>Settings</h1>
+<form id="profile_form" method="post" action="{% url 'users:settings' %}">
+    {% csrf_token %}
+    {{ email_form|crispy }}
+    <div>
+        {{ settings_form.rate_anon }}
+        <label class="right" for="{{ settings_form.rate_anon.id_for_label }}">
+            Rate as anonymous?
+        </label>
+    </div>
+    <div>
+        {{ settings_form.comment_anon }}
+        <label class="right" for="{{ settings_form.comment_anon.id_for_label }}">
+            Comment as anonymous?
+        </label>
+    </div>
+    <div id="div_id_rec_new_msg">
+        <label for="{{ settings_form.rec_new_msg.id_for_label }}">
+            Receive message?
+        </label>
+        {{ settings_form.rec_new_msg }}
+    </div>
+    <button class="btn-primary" type="submit">Update</button>
+</form>
+{% endblock inner_content %}

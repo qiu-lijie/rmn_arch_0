@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Follow - {{ block.super }}{% endblock title %}
+{% block metatags %}
+<meta name="robots" content="noindex">
+{% endblock metatags %}
+
+{% block js %}
+{{ block.super }}
+<script type="module">
+    import { Paginator } from "{% static 'js/pagination.js' %}";
+    import { get_post } from "{% static 'js/get_post.js' %}";
+
+    const comment_paginator = new Paginator('{{ request.path }}');
+
+    // open existing post
+    document.addEventListener(
+        'click',
+        (event) => { get_post(event); },
+        false,
+    );
+</script>
+{% endblock js %}
+
+{% block content %}
+<main class="centered">
+    <div class="post-list-container">
+        {% include page_template_name %}
+        {% if not posts %}
+        <h2 class="centered">You haven't follow anyone yet!</h2>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,6 @@
+<div class="rate-div{% if rate %} rated{% endif %}">
+    {% for i in '12345'|make_list %}
+    <span class="rate{% if rate|stringformat:'i' == i %} rated{% endif %}"
+        data-rate="{{ i }}">🔥</span>
+    {% endfor %}
+</div>

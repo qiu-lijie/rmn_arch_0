@@ -1,0 +1,10 @@
+<div class="comment{% if fade %} fade{% endif %}">
+    <img src="{{ comment.user_display_image_url }}" alt="Poster Profile Image"
+        class="img-circle m-profile-img">
+    <div>
+        <a {% if not comment.anonymous %}href="{{ comment.user.get_absolute_url }}" {% endif %}>
+            <strong>{{ comment.user_display_name }}</strong>
+        </a>
+        {{ comment.description }}
+    </div>
+</div>

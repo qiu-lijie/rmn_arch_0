@@ -1,0 +1,5 @@
+{% for comment in comments %}
+{% include 'posts/snippets/comment_snippet.html' %}
+{% endfor %}
+
+{{ page_obj.has_next|json_script:'comment_paginate_hook' }}

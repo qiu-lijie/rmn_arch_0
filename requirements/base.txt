@@ -1,0 +1,55 @@
+django==3.2.5
+
+# webservers
+gunicorn==20.1.0
+daphne==3.0.2
+
+# PostgreSQL database adapter
+psycopg2==2.9.1
+
+# simplified environment variable parsing
+environs==9.3.0
+
+# user account
+django-allauth==0.44.0
+
+# django-extensions for some additional models and runserver plus
+django-extensions==3.1.0
+
+# to use django ImageField
+Pillow==8.2.0
+
+# simple cities locations
+django-cities-light==3.8.1
+
+# form rendering
+django-crispy-forms==1.12.0
+
+# autocomplete (with jQuery)
+django-autocomplete-light==3.8.0
+
+# delete files on disk after object change/deletion
+django-cleanup==5.2.0
+
+# mailbackend
+django-anymail[amazon_ses]==8.4
+
+# s3 storage
+django-storages==1.11.1
+
+# sentry for logging
+sentry-sdk==1.3.1
+
+# websocket support
+channels==3.0.4
+channels-redis==3.3.0
+
+# basic CLI support
+mando==0.7.1
+
+# fake contents
+faker==13.0.0
+
+# manually installed
+# jquery==3.6.0
+# compressorjs==1.0.7

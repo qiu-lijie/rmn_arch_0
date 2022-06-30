@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Post by {{ post.user_display_name }} - {{ block.super }}{% endblock title %}
+
+{% block js %}
+{{ block.super }}
+<script type="module">
+    import { rate } from "{% static 'js/rate.js' %}";
+
+    document.addEventListener(
+        'click',
+        async (event) => { rate(event); },
+        false
+    );
+</script>
+{% endblock js %}
+
+{% block content %}
+<main class="centered">
+    <div class="card">
+        {% include 'posts/post_detail_post.html' %}
+    </div>
+</main>
+{% endblock %}

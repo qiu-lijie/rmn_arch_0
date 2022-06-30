@@ -1,0 +1,10 @@
+{% for post in posts %}
+<a href="{{ post.get_absolute_url }}" class="deco-none grid-item post{{ post.extra_css_class }}"
+    style="background-image: url('{{ post.thumbnail_image_url }}');" data-uuid="{{ post.uuid }}">
+    <div class="grid-content">
+        {% include 'posts/snippets/rating_snippet.html' with rate=post.rate %}
+    </div>
+</a>
+{% endfor %}
+
+{{ page_obj.has_next|json_script:'paginate_hook' }}

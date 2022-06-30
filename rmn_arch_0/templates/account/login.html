@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sign In - {{ block.super }}{% endblock title %}
+{% block metatags %}
+<meta name="robots" content="noindex">
+{% endblock metatags %}
+
+{% block content %}
+<main class="centered card">
+    <h1>Sign In</h1>
+
+    <p class="centered-text">
+        Don't have an account? Then please <a href="{{ signup_url }}">sign up</a>.
+    </p>
+
+    <form class="login col-2-to-3" method="POST" action="{% url 'account_login' %}">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div id="div_id_login" class="control-group">
+            <label for="{{ form.login.id_for_label }}" class="control-label requiredField">
+                Username
+            </label>
+            <div class="controls">
+                {{ form.login }}
+            </div>
+        </div>
+        <div id="div_id_password" class="control-group">
+            <label for="{{ form.password.id_for_label }}" class="control-label requiredField">
+                Password
+            </label>
+            <div class="controls">
+                {{ form.password }}
+            </div>
+        </div>
+        <a href="{% url 'account_reset_password' %}">Forgot Password?</a>
+        <div id="div_id_remember" class="control-group">
+            <div class="controls">
+                <label for="{{ form.remember.id_for_label }}" class="checkbox">
+                    {{ form.remember }}
+                    Remember Me
+                </label>
+            </div>
+        </div>
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+        <button class="btn-primary" type="submit">Sign In</button>
+    </form>
+</main>
+
+{% endblock %}

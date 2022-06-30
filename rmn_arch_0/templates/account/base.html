@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="vnav-div">
+    <div class="vertical-navbar">
+        <img class="img-circle" src="{{ user.profile_image_url }}" alt="Profile Image">
+        <div class="profile-div">
+            <span>{{ user.name }}</span>
+            <a href="{{ user.get_absolute_url }}">@{{ user.username }}</a>
+        </div>
+        {% with url_name=request.resolver_match.url_name %}
+        <div class="vertical-nav-group">
+            <a href="{% url 'users:profile_edit' %}"
+                class="{% if url_name == 'profile_edit' %}active{% endif %}">Profile</a>
+            <a href="{% url 'users:settings' %}" class="{% if url_name == 'settings' %}active{% endif %}">Settings</a>
+            <a href="{% url 'account_change_password' %}"
+                class="{% if url_name == 'account_change_password' %}active{% endif %}">Password</a>
+            <a href="{% url 'account_logout' %}" class="{% if url_name == 'account_logout' %}active{% endif %}">Sign
+                Out</a>
+        </div>
+        {% endwith %}
+    </div>
+    <div class="centered card">
+        {% block inner_content %}
+        {% endblock inner_content %}
+    </div>
+</main>
+{% endblock content %}

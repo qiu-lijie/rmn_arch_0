@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block js %}
+{{ block.super }}
+<script type="module">
+    import { Paginator } from "{% static 'js/pagination.js' %}";
+    import { rate } from "{% static 'js/rate.js' %}";
+    import { modal_show, modal_content, set_inner_html } from "{% static 'js/modal.js' %}";
+    import { get_post } from "{% static 'js/get_post.js' %}";
+
+    // create new post
+    document.addEventListener(
+        'click',
+        async (event) => {
+            if (event.target.matches('.add')) {
+                let res = await fetch(window.dj_data.urls.posts.post_create_modal);
+                if (!res.ok) {
+                    modal_content.innerHTML = 'Network Error';
+                } else {
+                    res = await res.text();
+                    set_inner_html(modal_content, res);
+                }
+                let main = modal_content.querySelector('main');
+                if (main) {
+                    // hacky way to deal with signup modal
+                    modal_content.querySelector('nav').remove();
+                    modal_content.querySelector('#pop-ups').remove();
+                    main.classList.remove('card');
+                    modal_content.innerHTML = modal_content.innerHTML.replace(
+                        'account? Then please',
+                        'account?<br>Then please'
+                    );
+                }
+                modal_show();
+            }
+        },
+        false
+    );
+
+    // open existing post
+    document.addEventListener(
+        'click',
+        (event) => { get_post(event); },
+        false,
+    );
+
+    // handle ratings
+    document.addEventListener(
+        'click',
+        (event) => { rate(event); },
+        false,
+    );
+
+    // show new user demo page
+    if (JSON.parse(document.getElementById('first_visit').innerHTML)) {
+        modal_content.innerHTML = `
+        <div class="flex-row-to-rev-cols">
+                <img src="{% static 'images/demo.gif' %}" alt="Instruction Gif"
+                    class="demo-img">
+                <div class="demo-text">
+                    <h2 class="centered-text">Welcome to rmn_arch_0!</h1>
+                    <p>Here, you can</p>
+                    <ul>
+                        <li>freely share your own nudes</li>
+                        <li>rate others' nudes</li>
+                        <li>leave comments and connect with other users</li>
+                        <li>follow your favourite creators</li>
+                    </ul>
+                    <p>and much more!</p>
+                    <p>Join us and get started! XOXO</p>
+                    <p class="right-text">- the Team at rmn_arch_0</p>
+                </div>
+            </div>
+        `;
+        modal_show();
+    }
+
+    // enable pagination
+    new Paginator('{{ request.path }}');
+</script>
+
+{% if first_visit %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=The+Girl+Next+Door&display=swap"
+    rel="stylesheet">
+{% endif %}
+
+{{ first_visit|json_script:'first_visit' }}
+{% endblock js %}
+
+{% block content %}
+<main class="grid">
+    <div class="grid-item add" style="background-image: url('{% static 'images/plus.svg' %}')">
+        <div class="grid-content add">
+        </div>
+    </div>
+    {% include page_template_name %}
+</main>
+{% endblock %}

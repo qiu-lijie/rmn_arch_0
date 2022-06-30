@@ -1,0 +1,23 @@
+{
+    "editor.rulers": [
+        100
+    ],
+    "files.eol": "\n",
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    },
+    "html.format.endWithNewline": true,
+    "html.format.wrapLineLength": 100,
+    "html.format.templating": true,
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "javascript.format.semicolons": "insert",
+    "javascript.preferences.quoteStyle": "single",
+    "typescript.preferences.quoteStyle": "single",
+    "mocha-snippets.glob": "**/*.test.js",
+    "python.terminal.activateEnvironment": false,
+}

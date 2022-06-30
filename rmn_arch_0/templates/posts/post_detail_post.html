@@ -1,0 +1,210 @@
+{% load static %}
+{% load crispy_forms_tags %}
+
+<script type="module">
+    import { Carousel } from "{% static 'js/carousel.js' %}";
+    import { check_textarea_length } from "{% static 'js/form_validation.js' %}";
+    import { Paginator } from "{% static 'js/pagination.js' %}";
+    import { follow } from "{% static 'js/follow.js' %}";
+
+    new Carousel();
+    const comment_paginator = new Paginator(
+        '{{ request.path }}',
+        50,
+        document.querySelector('.post-comments'),
+        'comment_paginate_hook',
+    );
+
+    // add validator to textarea
+    document.querySelectorAll('textarea').forEach((elem) => {
+        elem.addEventListener('input', (event) => {
+            check_textarea_length(event);
+        }, false);
+    });
+
+    // handles comment submit
+    document.getElementById('comment_form').addEventListener(
+        'submit',
+        async (event) => {
+            event.preventDefault();
+            event.target.querySelector('button').disabled = true;
+            const data = new FormData(event.target);
+            const res = await fetch("{% url 'posts:post_comment' post.uuid %}", {
+                method: 'POST',
+                body: data,
+            });
+            if (!res.ok) {
+                event.target.innerHTML = 'Network error, please try again later';
+            } else {
+                // show the comment rightaway if able
+                if (!comment_paginator.more) {
+                    // remove the cta if exists
+                    const comment_cta = document.getElementById('comment_cta');
+                    if (comment_cta) {
+                        comment_cta.remove();
+                    }
+
+                    const content = document.createElement('div');
+                    content.innerHTML = await res.text();
+                    const paginate_hook = document.getElementById('comment_paginate_hook');
+                    paginate_hook.before(content);
+                    content.replaceWith(...content.childNodes);
+                    comment_paginator.scorll_obj.scrollTop = comment_paginator.scorll_obj.scrollHeight;
+                }
+
+                // reset the form content
+                event.target.reset();
+                document.getElementById('id_comment-description').dispatchEvent(
+                    new Event('input', { bubbles: true }));
+                event.target.querySelector('button').disabled = false;
+            }
+        },
+        false
+    );
+
+    // handle report
+    document.getElementById('id_report_icon').addEventListener(
+        'click',
+        (event) => {
+            event.target.classList.toggle('active');
+            document.querySelector('.post-comments').classList.toggle('dsp-none');
+            document.querySelector('.post-comment-form').classList.toggle('dsp-none');
+            document.querySelector('.post-report-form').classList.toggle('dsp-none');
+        },
+        false);
+    document.getElementById('report_form').addEventListener(
+        'submit',
+        async (event) => {
+            event.preventDefault();
+            event.target.querySelector('button').disabled = true;
+            const data = new FormData(event.target);
+            const res = await fetch("{% url 'posts:post_report' post.uuid %}", {
+                method: 'POST',
+                body: data,
+            });
+            if (!res.ok) {
+                event.target.innerHTML = 'Network error, please try again later';
+            } else {
+                event.target.innerHTML = 'Your report has been submitted!'
+            }
+        },
+        false
+    );
+
+    // handle follow
+    const follow_icon = document.getElementById('id_follow_icon_post');
+    if (follow_icon) {
+        follow_icon.addEventListener(
+            'click',
+            (event) => { follow(event); },
+            false,
+        );
+    }
+</script>
+
+<div class="post-detail-div">
+    <div class="carousel-div">
+        <div class="carousel">
+            {% for img in post.postimage_set.all %}
+            <img class="carousel-cell fade" src="{{ img.image.url }}" alt="Post Image">
+            {% endfor %}
+            <a class="prev">
+                <span>&#10094;</span>
+            </a>
+            <a class="next">
+                <span>&#10095;</span>
+            </a>
+        </div>
+        <div class="carousel-dots">
+            {% for img in post.postimage_set.all %}
+            <span class="dot" data-index="{{ forloop.counter0 }}"></span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="post-sidebar" data-uuid="{{ post.uuid }}">
+        <div class="post-user">
+            <img src="{{ post.user_display_image_url }}" alt="Poster Profile Image"
+                class="img-circle m-profile-img">
+            <div class="post-user-info">
+                <a {% if not post.anonymous %}href="{{ post.user.get_absolute_url }}" {% endif %}>
+                    <strong>{{ post.user_display_name }}</strong>
+                </a>
+                {% if not post.anonymous and post.user.profile.location %}
+                <div class="post-user-location">{{ post.user.profile.location }}</div>
+                {% endif %}
+            </div>
+            {% if user.is_authenticated and not post.anonymous and user != post.user %}
+            <a href="{% url 'chat:messages' %}?user={{ post.user.username }}" class="icon post-icon" id="id_chat_icon_post"></a>
+            <div class="icon post-icon follow-icon{% if post.user in user.relations.follows.all %} active{% endif %}"
+                id="id_follow_icon_post" data-username="{{ post.user.username }}"></div>
+            {% endif %}
+        </div>
+        <div class="post-comments">
+            {% if post.description %}
+            {% include 'posts/snippets/comment_snippet.html' with comment=post %}
+            {% endif %}
+            {% if post.comment_set.count == 0 %}
+            <div class="comment" id="comment_cta">
+                Be the first to comment this post!
+            </div>
+            {% endif %}
+            {% include page_template_name %}
+        </div>
+        <div class="post-reactions">
+            {% include 'posts/snippets/rating_snippet.html' %}
+            <div class="list-icons">
+                <div class="icon post-extra-icon" id="id_report_icon"></div>
+            </div>
+            <div class="post-ratings">
+                {% if post.rating_summary.image %}
+                <img class="img-circle" src="{{ post.rating_summary.image }}"
+                    alt="Rater Profile Image">
+                <span>
+                    Rated by <strong>{{ post.rating_summary.name }}</strong> and
+                    {{ post.rating_count }} others
+                </span>
+                {% else %}
+                <span>
+                    Be the first to rate this post!
+                </span>
+                {% endif %}
+            </div>
+            {% if post.rating_count >= post.MIN_RATINGS_TO_SHOW %}
+            <div class="post-avg-rating fade{% if rate %} rated{% endif %}">
+                with an average rating of {{ post.avg_rate|floatformat }}
+            </div>
+            {% endif %}
+        </div>
+        <form id="comment_form" class="post-comment-form">
+            {% if user.is_authenticated %}
+            {% csrf_token %}
+            <div>
+                <div>{{ comment_form.description }}</div>
+            </div>
+            <button class="btn-secondary">Comment</button>
+            {% else %}
+            <span>Please
+                <a href="{% url 'account_login' %}?next={% url 'posts:post_detail' post.uuid %}">
+                    sign in
+                </a>
+                to comment
+            </span>
+            {% endif %}
+        </form>
+        <form id="report_form" class="post-report-form dsp-none">
+            {% if user.is_authenticated %}
+            {% csrf_token %}
+            {{ report_form|crispy }}
+            <button class="btn-secondary">Report</button>
+            {% else %}
+            <span>Please
+                <a href="{% url 'account_login' %}?next={% url 'posts:post_detail' post.uuid %}">
+                    sign in
+                </a>
+                to report
+            </span>
+            {% endif %}
+        </form>
+    </div>
+</div>

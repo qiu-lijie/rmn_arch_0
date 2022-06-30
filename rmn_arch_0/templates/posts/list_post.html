@@ -1,0 +1,21 @@
+{% for post in posts %}
+<div class="post-list-div">
+    <img src="{{ post.user_display_image_url }}" alt="Poster Profile Image"
+        class="img-circle m-profile-img">
+    <div class="post-list-content">
+        <strong>{{ post.user_display_name }}</strong>
+        {% if post.description %}
+        <span>{{ post.description }}</span>
+        {% endif %}
+        <div class="grid">
+            {% for image in post.postimage_set.all %}
+            <a href="{{ post.get_absolute_url }}" class="deco-none grid-item post"
+                style="background-image: url('{{ image.image.url }}');" data-uuid="{{ post.uuid }}">
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{{ page_obj.has_next|json_script:'paginate_hook' }}

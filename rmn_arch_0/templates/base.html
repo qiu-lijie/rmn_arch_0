@@ -1,0 +1,142 @@
+{% load static %}
+{% load chat_tags %}
+
+<!DOCTYPE html>
+<html lang="en" tabindex="0">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}rmn_arch_0{% endblock title %}</title>
+    <meta name="description"
+        content="rmn_arch_0 is the best free and safe nudity sharing community for all your naughty needs! Join today to post your nudes!">
+    {% block metatags %}
+    {% endblock metatags %}
+
+    {% block js %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYH0K31WNG"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-PYH0K31WNG');
+    </script>
+
+    <script type="module">
+        import { get_cookie } from "{% static 'js/get_cookie.js' %}";
+
+        // store django urls and other related data
+        window.dj_data = {
+            csfr_token: get_cookie('csrftoken'),
+            url_key: 'd641092d-eeb3-414f-bfa5-a208b1f628e2',
+            urls: {
+                chat: {
+                    messages: "{% url 'chat:messages' %}",
+                    chat_content: "{% url 'chat:chat_content' 'd641092d-eeb3-414f-bfa5-a208b1f628e2' %}",
+                },
+                posts: {
+                    post_create_modal: "{% url 'posts:post_create_modal' %}",
+                    post_detail_modal: "{% url 'posts:post_detail_modal' 'd641092d-eeb3-414f-bfa5-a208b1f628e2' %}",
+                    rate: "{% url 'posts:rate' %}",
+                },
+                users: {
+                    username_check: "{% url 'users:username_check' %}",
+                    follow: "{% url 'users:follow' %}",
+                },
+            },
+        }
+
+        // hide messages
+        let pops = document.getElementById('pop-ups').children;
+        setTimeout((elem) => {
+            for (let elem of pops) {
+                elem.classList.add('removed');
+            }
+        }, 4000);
+    </script>
+    {% endblock %}
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon/favicon.ico' %}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <nav>
+        <div class="navbar">
+            <a href="{% url 'posts:home' %}">
+                <img class="logo" src="{% static 'images/logo.png' %}" alt="rmn_arch_0 Logo">
+            </a>
+            <div class="nav-group-div">
+                <img class="icon nav-menu-btn" src="{% static 'images/menu.svg' %}" alt="Menu Icon"
+                    tabindex="1">
+                {% with url_name=request.resolver_match.url_name %}
+                <ul class="list-icons nav-group">
+                    <li>
+                        <a href="{% url 'posts:home' %}">
+                            <div class="icon nav-icon{% if url_name == 'home' %} active{% endif %}"
+                                id="id_home_icon"></div>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'posts:rank' %}">
+                            <div class="icon nav-icon{% if url_name == 'rank' %} active{% endif %}"
+                                id="id_rank_icon"></div>
+                            <span>Rank</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'posts:follow' %}">
+                            <div class="icon nav-icon{% if url_name == 'follow' %} active{% endif %}"
+                                id="id_follow_icon"></div>
+                            <span>Follow</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'chat:messages' %}">
+                            <div class="icon nav-icon{% chat_extra_css url_name user %}"
+                                id="id_chat_icon"></div>
+                            <span>Messages</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'users:profile_edit' %}">
+                            <img class="icon img-circle{% if url_name == 'profile_edit' %} active{% endif %}"
+                                src="{% if user.is_authenticated %}{{ user.profile_image_url }}{% else %}{% static 'images/default_profile_img.png' %}{% endif %}"
+                                alt="Profile Image" id="profile_image">
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                </ul>
+                {% endwith %}
+            </div>
+        </div>
+    </nav>
+    <div id="pop-ups">
+        {% if messages %}
+        {% for message in messages %}
+        <div>
+            {{message.level_tag}}: {{message}}
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+    <div class="modal">
+        <span class="close">&times;</span>
+        <div class="modal-content">
+        </div>
+    </div>
+
+    {% block content %}
+    {% endblock %}
+
+    {% csrf_token %}
+</body>
+
+</html>

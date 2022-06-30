@@ -1,0 +1,15 @@
+<div class="msgs-room-content" id="{{ id }}_content">
+    <div class="msgs-room-msgs">
+        {% for msg in msgs %}
+        <div class="msgs-room-msg{% if msg.user == user %} self{% endif %}">
+            <img src="{{ msg.user.profile_image_url }}"
+                alt="Profile Image for {{ msg.user.name }}" class="img-circle m-profile-img">
+            <span class="msgs-text">{{ msg.content }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="msgs-room-inputs">
+        <textarea></textarea>
+        <button class="btn-secondary">Send</button>
+    </div>
+</div>

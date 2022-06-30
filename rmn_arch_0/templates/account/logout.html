@@ -1,0 +1,20 @@
+{% extends "account/base.html" %}
+
+{% block title %}Sign Out - {{ block.super }}{% endblock title %}
+{% block metatags %}
+<meta name="robots" content="noindex">
+{% endblock metatags %}
+
+{% block inner_content %}
+<h1>Sign Out</h1>
+
+<p class="centered-text">Are you sure you want to sign out?</p>
+
+<form method="post" action="{% url 'account_logout' %}">
+    {% csrf_token %}
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+    <button class="btn-primary" type="submit">Confirm</button>
+</form>
+{% endblock inner_content %}

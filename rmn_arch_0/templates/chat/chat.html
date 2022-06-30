@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Messages - {{ block.super }}{% endblock title %}
+{% block metatags %}
+<meta name="robots" content="noindex">
+{% endblock metatags %}
+
+{% block js %}
+{{ block.super }}
+<script src="{% static 'js/chat.js' %}" type="module"></script>
+{% endblock js %}
+
+{% block content %}
+{{ user.username|json_script:"username" }}
+<main class="card msgs-container">
+    <div class="msgs-room-list" id="room_list">
+        {% if new_room_name %}
+        <div class="msgs-room active" id="{{ new_room_name }}" data-new-convo="true"
+            data-username="{{ tar_user.username }}">
+            <img src="{{ tar_user.profile_image_url }}" alt="Profile Image for {{ tar_user.name }}"
+                class="img-circle m-profile-img">
+            <div class="msgs-room-summary">
+                <strong>{{ tar_user.name }}</strong>
+                <div class="msg-room-latest">New Conversation</div>
+            </div>
+        </div>
+        {% endif %}
+        {% for room in rooms %}
+        <div class="msgs-room{% if room.unread %} unread{% endif %}{{room.extra_css_class}}" id="{{ room.name }}"
+            data-username="{{ room.other_user.username }}">
+            <img src="{{ room.other_user.profile_image_url }}"
+                alt="Profile Image for {{ room.other_user.name }}"
+                class="img-circle m-profile-img">
+            <div class="msgs-room-summary">
+                <strong>{{ room.other_user.name }}</strong>
+                <div class="msg-room-latest">{{ room.last_msg_content }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="msgs-room-container" id="room_container">
+        {% if not rooms and not new_room_name%}
+        <h1 class="centered">
+            CHAT WITH ME!
+        </h1>
+        {% endif %}
+        {% if new_room_name %}
+        {% include 'chat/chat_content.html' with id=new_room_name %}
+        {% endif %}
+    </div>
+</main>
+{% endblock content %}

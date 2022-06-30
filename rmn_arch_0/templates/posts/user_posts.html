@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Posts by {{ curr_user.name }} - {{ block.super }}{% endblock title %}
+
+{% block js %}
+{{ block.super }}
+<script type="module">
+    import { Paginator } from "{% static 'js/pagination.js' %}";
+    import { follow } from "{% static 'js/follow.js' %}";
+    import { get_post } from "{% static 'js/get_post.js' %}";
+
+    const comment_paginator = new Paginator('{{ request.path }}');
+
+    // handle follow
+    const follow_icon = document.getElementById('id_follow_icon_user');
+    if (follow_icon) {
+        follow_icon.addEventListener(
+            'click',
+            (event) => { follow(event); },
+            false,
+        );
+    }
+
+    // open existing post
+    document.addEventListener(
+        'click',
+        (event) => { get_post(event); },
+        false,
+    );
+</script>
+{% endblock js %}
+
+{% block content %}
+<main class="centered">
+    <div class="users-posts-profile">
+        <div class="user-posts-user">
+            <img src="{{ curr_user.profile_image_url }}" alt="User Profile Image"
+                class="img-circle user-post-img">
+            <div class="profile-div">
+                <span>{{ curr_user.name }}</span>
+                <a>@{{ curr_user.username }}</a>
+            </div>
+        </div>
+        {% if user.is_authenticated and user != curr_user %}
+        <div class="list-icons">
+            <a href="{% url 'chat:messages' %}?user={{ curr_user.username }}" class="icon user-icon" id="id_chat_icon_user"></a>
+            <div class="icon user-icon follow-icon{% if curr_user in user.relations.follows.all %} active{% endif %}"
+                id="id_follow_icon_user" data-username="{{ curr_user.username }}"></div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="users-posts-follow-block">
+        <span>{{ curr_user.pub_post_count }} posts</span>
+        <span>{{ curr_user.follower_count }} followers</span>
+        <span>{{ curr_user.following_count }} following</span>
+    </div>
+    <div class="post-list-container">
+        {% include page_template_name %}
+        {% if not posts %}
+        <h2 class="centered">{{ curr_user.name }} has no posts yet!</h2>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
